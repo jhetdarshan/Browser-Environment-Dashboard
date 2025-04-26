@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Environment Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            transition: background-color 0.5s;
+        }
+        header {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        section {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #292828;
+            margin-bottom: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 15px;
+            font-size: 16px;
+        }
+        .info {
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Student Profile</h1>
+    <p><strong>Complete Name:</strong> Jeet P. Kumar</p>
+    <p><strong>Sex:</strong> Female</p>
+    <p><strong>Address:</strong> Catagbacan, Goa, Camarines Sur</p>
+    <p><strong>Course, Year, Section:</strong> BSIT 2-B</p>
+    <p><strong>Name of School:</strong> Partido State University</p>
+    <p><strong>Semester and Academic Year:</strong> 2nd Semester, A.Y. 2024-2025</p>
+    <p><strong>Subject Code and Title:</strong> PF2 - Event Driven Programming</p>
+    <p><strong>Name of Subject Instructor:</strong> Arjay F. Abio</p>
+</header>
+
+<section id="browser-info">
+    <h2>Browser Information</h2>
+    <div class="info" id="browserDetails"></div>
+</section>
+
+<section id="page-info">
+    <h2>Page Information and Controls</h2>
+    <div class="info" id="pageDetails"></div>
+    <button onclick="changeTitle()">Change Page Title</button>
+</section>
+
+<section id="navigation-controls">
+    <center>
+    <button onclick="reloadPage()">Reload Page</button>
+    <button onclick="redirectPage()">Redirect</button>
+    <button onclick="goBack()">Go Back</button>
+    <button onclick="goForward()">Go Forward</button></center>  
+</section>
+
+<script>
+// Part A: Display Browser Information
+function showBrowserInfo() {
+    const browserInfo = `
+        <p><strong>Browser:</strong> ${navigator.appName} (${navigator.appVersion})</p>
+        <p><strong>Platform (OS):</strong> ${navigator.platform}</p>
+        <p><strong>Java Enabled:</strong> ${navigator.javaEnabled()}</p>
+        <p><strong>Screen Resolution:</strong> ${screen.width} x ${screen.height}</p>
+        <p><strong>Available Screen Size:</strong> ${screen.availWidth} x ${screen.availHeight}</p>
+        <p><strong>Color Depth:</strong> ${screen.colorDepth} bits</p>
+    `;
+    document.getElementById('browserDetails').innerHTML = browserInfo;
+}
+
+// Part B: Page Information and Controls
+function showPageInfo() {
+    const pageInfo = `
+        <p><strong>Current URL:</strong> ${location.href}</p>
+        <p><strong>Hostname:</strong> ${location.hostname}</p>
+        <p><strong>Page Title:</strong> <span id="currentTitle">${document.title}</span></p>
+    `;
+    document.getElementById('pageDetails').innerHTML = pageInfo;
+}
+
+function changeTitle() {
+    const newTitle = prompt("Enter a new page title:");
+    if (newTitle) {
+        document.title = newTitle;
+        document.getElementById('currentTitle').innerText = newTitle;
+    }
+}
+
+// Part C: Navigation Controls
+function reloadPage() {
+    location.reload();
+}
+
+function redirectPage() {
+    const newURL = prompt("Enter the URL you want to visit (include https://):");
+    if (newURL) {
+        location.href = newURL;
+    }
+}
+
+function goBack() {
+    history.back();
+}
+
+function goForward() {
+    history.forward();
+}
+
+// Part D: Dynamic Styling with Screen Info
+function updateBackgroundColor() {
+    const width = window.innerWidth;
+    if (width < 600) {
+        document.body.style.backgroundColor = "blue";
+    } else if (width >= 600 && width <= 991) {
+        document.body.style.backgroundColor = "green";
+    } else {
+        document.body.style.backgroundColor = "orange";
+    }
+}
+
+// Initialize Page
+window.onload = function() {
+    showBrowserInfo();
+    showPageInfo();
+    updateBackgroundColor();
+};
+
+window.onresize = function() {
+    updateBackgroundColor();
+};
+
+</script>
+
+</body>
+</html>
