@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DOM Traversal and Manipulation</title>
+  <style>
+    :root {
+      --grandparent-color: #ffe5e5;
+      --parent-color: #e5ffe5;
+      --child-color: #e5e5ff;
+      --highlight-color: #fff176;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      margin: 0;
+      padding: 2rem;
+    }
+
+    header {
+      background-color: #f0f0f0;
+      padding: 2rem;
+      border-left: 5px solid #1976d2;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .tree-node {
+      margin: 0.5rem;
+      padding: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .grandparent {
+      background-color: var(--grandparent-color);
+      border: 2px solid #e53935;
+    }
+
+    .parent {
+      background-color: var(--parent-color);
+      border: 2px solid #43a047;
+      margin-left: 1rem;
+    }
+
+    .child {
+      background-color: var(--child-color);
+      border: 2px solid #1e88e5;
+      margin-left: 2rem;
+    }
+
+    .highlight {
+      background-color: var(--highlight-color) !important;
+      outline: 2px;
+    }
+
+    .controls {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .controls button {
+      margin: 0.3rem;
+      padding: 0.5rem 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      background-color: #1976d2;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .controls button:hover {
+      background-color: #0d47a1;
+    }
+
+    .tree-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <strong>Complete Name:</strong> Jeet Palero Kumar<br>
+    <strong>Sex:</strong> Female<br>
+    <strong>Address:</strong> Catagbacan, Goa, Camarines Sur<br>
+    <strong>Course, Year, and Section:</strong> BSIT-2B<br>
+    <strong>Name of School:</strong> Partido State University<br>
+    <strong>Semester and Academic Year:</strong> 2nd Semester, A.Y. 2024-2025<br>
+    <strong>Subject Code and Title:</strong> PF2 - Event Driven Programming<br>
+    <strong>Subject Instructor:</strong> Arjay F. Abio
+  </header>
+
+  <div id="tree" class="tree-container">
+    <div id="grandparent" class="tree-node grandparent">
+      Grandparent
+      <div class="tree-node parent">
+        Parent 1
+        <div class="tree-node child">Child 1.1</div>
+        <div class="tree-node child">Child 1.2</div>
+      </div>
+      <div class="tree-node parent">
+        Parent 2
+        <div class="tree-node child">Child 2.1</div>
+        <div class="tree-node child">Child 2.2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="traverseUp()">↑ Traverse Up</button>
+    <button onclick="traverseDown()">↓ Traverse Down</button>
+    <button onclick="traversePrevious()">← Previous Sibling</button>
+    <button onclick="traverseNext()">→ Next Sibling</button>
+    <button onclick="addChild()">Add Child</button>
+    <button onclick="deleteNode()">Delete Node</button>
+  </div>
+
+  <script>
+    let selectedNode = null;
+
+    document.querySelectorAll('.tree-node').forEach(addSelectionHandler);
+
+    function addSelectionHandler(node) {
+      node.addEventListener('click', function (e) {
+        e.stopPropagation();
+        selectNode(this);
+      });
+    }
+
+    function selectNode(node) {
+      if (selectedNode) {
+        selectedNode.classList.remove('highlight');
+      }
+      selectedNode = node;
+      selectedNode.classList.add('highlight');
+    }
+
+    function traverseUp() {
+      if (!selectedNode) return;
+      const parent = selectedNode.parentElement.closest('.tree-node');
+      if (parent) selectNode(parent);
+    }
+
+    function traverseDown() {
+      if (!selectedNode) return;
+      const child = selectedNode.querySelector(':scope > .tree-node');
+      if (child) selectNode(child);
+    }
+
+    function traversePrevious() {
+      if (!selectedNode) return;
+      const prev = selectedNode.previousElementSibling;
+      if (prev?.classList.contains('tree-node')) selectNode(prev);
+    }
+
+    function traverseNext() {
+      if (!selectedNode) return;
+      const next = selectedNode.nextElementSibling;
+      if (next?.classList.contains('tree-node')) selectNode(next);
+    }
+
+    function addChild() {
+      if (!selectedNode) {
+        alert("Select a node first.");
+        return;
+      }
+
+      if (selectedNode.classList.contains('grandparent')) {
+        const newParent = createNode('parent', 'New Parent');
+        const child1 = createNode('child', 'Child A');
+        const child2 = createNode('child', 'Child B');
+        newParent.append(child1, child2);
+        selectedNode.appendChild(newParent);
+      } else if (selectedNode.classList.contains('parent')) {
+        const newChild = createNode('child', 'New Child');
+        selectedNode.appendChild(newChild);
+      } else {
+        alert("You cannot add children to a child node.");
+      }
+    }
+
+    function deleteNode() {
+      if (!selectedNode) {
+        alert("No node selected.");
+        return;
+      }
+
+      if (selectedNode.id === 'grandparent') {
+        alert("Cannot delete the grandparent node.");
+        return;
+      }
+
+      const parent = selectedNode.parentElement;
+      parent.removeChild(selectedNode);
+      selectedNode = null;
+    }
+
+    function createNode(type, text) {
+      const node = document.createElement('div');
+      node.className = `tree-node ${type}`;
+      node.textContent = text;
+      addSelectionHandler(node);
+      return node;
+    }
+  </script>
+
+</body>
+</html>
