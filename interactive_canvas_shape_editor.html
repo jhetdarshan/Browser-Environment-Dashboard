@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Canvas Shape Editor</title>
+</head>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+  }
+  
+  header {
+    width: 350px;
+    background-color: #003366;
+    color: #ffffff;
+    padding: 30px 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  header h1 {
+    font-size: 30px;
+    margin-bottom: 25px;
+  }
+  
+  header p {
+    margin: 10px 0;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  
+  main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  canvas {
+    width: 600px;
+    height: 400px;
+    border: 2px solid #333;
+    background-color: #ffffff;
+    cursor: crosshair;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+</style>
+
+<body>
+  <header>
+    <h1>Interactive Canvas Shape Editor</h1>
+    <p>
+        <strong>Complete Name:</strong> Jeet Palero Kumar<br>
+        <strong>Sex:</strong> Female<br>
+        <strong>Address:</strong> Catagbacan, Goa, Camarines Sur<br>
+        <strong>Course, Year, and Section:</strong> BSIT-2B<br>
+        <strong>Name of School:</strong> Partido State University<br>
+        <strong>Semester and Academic Year:</strong> 2nd Semester, A.Y. 2024-2025<br>
+        <strong>Subject Code and Title:</strong> PF2 - Event Driven Programming<br>
+        <strong>Subject Instructor:</strong> Arjay F. Abio
+    </p>
+  </header>
+
+  <main>
+    <canvas id="canvas" width="600" height="400"></canvas>
+  </main>
+
+  <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let circles = [];
+        let selectedCircle = null;
+        let isDragging = false;
+
+        const defaultRadius = 20;
+        const minRadius = 5;
+        const maxRadius = 150;
+
+        function drawCircles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          circles.forEach(circle => {
+            ctx.beginPath();
+            ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+            ctx.fillStyle = circle === selectedCircle ? 'red' : 'blue';
+            ctx.fill();
+          });
+        }
+
+        function getMousePos(evt) {
+          const rect = canvas.getBoundingClientRect();
+          return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+          };
+        }
+
+        function findCircle(pos) {
+          return circles.find(c => {
+            const dx = c.x - pos.x;
+            const dy = c.y - pos.y;
+            return Math.sqrt(dx * dx + dy * dy) <= c.radius;
+          });
+        }
+
+        canvas.addEventListener('click', function(evt) {
+          const pos = getMousePos(evt);
+          const hitCircle = findCircle(pos);
+          if (hitCircle) {
+            selectedCircle = hitCircle;
+          } else {
+            circles.push({ x: pos.x, y: pos.y, radius: defaultRadius });
+            selectedCircle = null;
+          }
+          drawCircles();
+        });
+
+        canvas.addEventListener('mousedown', function(evt) {
+          const pos = getMousePos(evt);
+          if (findCircle(pos) === selectedCircle) {
+            isDragging = true;
+          }
+        });
+
+        canvas.addEventListener('mousemove', function(evt) {
+          if (isDragging && selectedCircle) {
+            const pos = getMousePos(evt);
+            selectedCircle.x = pos.x;
+            selectedCircle.y = pos.y;
+            drawCircles();
+          }
+        });
+
+        canvas.addEventListener('mouseup', function() {
+          isDragging = false;
+        });
+
+        window.addEventListener('keydown', function(evt) {
+          if (evt.key === 'Delete' && selectedCircle) {
+            circles = circles.filter(c => c !== selectedCircle);
+            selectedCircle = null;
+            drawCircles();
+          }
+        });
+
+        canvas.addEventListener('wheel', function(evt) {
+          if (selectedCircle) {
+            evt.preventDefault();
+            selectedCircle.radius += evt.deltaY < 0 ? 2 : -2;
+
+            if (selectedCircle.radius < minRadius) {
+              selectedCircle.radius = minRadius;
+            } else if (selectedCircle.radius > maxRadius) {
+              selectedCircle.radius = maxRadius;
+            }
+
+            drawCircles();
+          }
+        });
+
+  </script>
+</body>
+</html>
